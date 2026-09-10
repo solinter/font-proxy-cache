@@ -1,6 +1,7 @@
 # Font Proxy Cache
 
-Serves external font dependencies from the site itself. The browser no longer contacts
+A WordPress plugin (WordPress 6.2+, PHP 7.4+) that serves external font dependencies from the
+site itself. The browser no longer contacts
 `fonts.googleapis.com`, `fonts.gstatic.com` or `use.fontawesome.com`. WordPress fetches
 those files once, keeps them as content-addressed objects in the persistent object cache
 (Redis) and serves them from `/font-proxy/...`. **Nothing is written to disk.**
@@ -10,6 +11,14 @@ those files once, keeps them as content-addressed objects in the persistent obje
         ↓
 <link href="https://example.com/font-proxy/<sig>/fonts.googleapis.com/css?family=Montserrat:regular">
 ```
+
+## Installation
+
+1. Copy the `font-proxy-cache` folder to `wp-content/plugins/`.
+2. Make sure a persistent object cache is enabled (see Requirements).
+3. Activate **Font Proxy Cache** under Plugins, or run `wp plugin activate font-proxy-cache`.
+
+No configuration is needed. Status and cache management are under **Tools → Font Proxy Cache**.
 
 ## Requirements
 
