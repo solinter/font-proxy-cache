@@ -8,22 +8,24 @@ those files once, keeps them as content-addressed objects in the persistent obje
 ```
 <link href="//fonts.googleapis.com/css?family=Montserrat:regular&ver=7.1">
         ↓
-<link href="https://gaiyu.net/font-proxy/<sig>/fonts.googleapis.com/css?family=Montserrat:regular">
+<link href="https://example.com/font-proxy/<sig>/fonts.googleapis.com/css?family=Montserrat:regular">
 ```
 
 ## Requirements
 
 - **A connected persistent object cache.** In practice that means the Redis Object Cache plugin
-  with its `object-cache.php` drop-in enabled. With this image, set `WP_REDIS_DISABLED=false` so
-  the entrypoint installs the drop-in.
+  with its `object-cache.php` drop-in enabled (Settings → Redis → Enable Object Cache, or
+  `wp redis enable`). Other persistent object cache drop-ins should also work, but only Redis
+  Object Cache has been tested.
 - **Activation is refused without it.** If the object cache later becomes unavailable, the
   plugin turns itself off and shows an admin notice. "Unavailable" covers three cases: the
   drop-in is removed, Redis is unreachable, or the group is listed in `WP_REDIS_IGNORED_GROUPS`.
 - **If Redis goes down, the whole site is down, unless graceful mode is on.** With
   `WP_REDIS_GRACEFUL` unset, the Redis Object Cache drop-in stops the whole site with "Error
   establishing a Redis connection" whenever Redis is unreachable, before any plugin loads.
-  Define `WP_REDIS_GRACEFUL` as `true` (e.g. via `WORDPRESS_CONFIG_EXTRA`) to keep the site
-  running without Redis. This plugin then switches itself off.
+  Define `WP_REDIS_GRACEFUL` as `true` in `wp-config.php` (or via `WORDPRESS_CONFIG_EXTRA` in
+  the official WordPress Docker image) to keep the site running without Redis. This plugin
+  then switches itself off.
 - **While off:**
   - pages keep their original CDN URLs
   - `/font-proxy/` URLs still referenced by cached pages answer with a `302` to the CDN, with
@@ -74,7 +76,8 @@ those files once, keeps them as content-addressed objects in the persistent obje
    - **A hit costs two Redis GETs** (ref and object).
    - **Evicted keys are fetched again automatically.** If Redis evicts a ref or an object (e.g.
      `maxmemory-policy allkeys-lru`), the file is fetched again on its next request.
-   - **Size:** the Font Awesome and Montserrat files used by the site take about 1.5 MB.
+   - **Size:** a typical setup (one Google Fonts family and Font Awesome 6) uses a few hundred KB
+     to about 1.5 MB. Font Awesome's TTF fallbacks are cached only if a browser requests them.
 
 ## No duplicates
 
